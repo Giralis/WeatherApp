@@ -37,7 +37,7 @@ class TableViewController: UITableViewController {
         cities = [favouriteCities, filteredCities]
     }
     
-    //MARK: Get users current location and trigger didSet in currentLocation variable
+    //MARK: Get users current location and trigger didSet in currentLocation
     func getLocation() {
         LocationManager.shared.getUserLocation { [weak self] location in
             DispatchQueue.main.async {
@@ -79,6 +79,7 @@ class TableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        //if we don't have favourite cities and user disagrees to share location - we don't need title for header
         if section == 0 && cities.count == 1 {
             return nil
         } else if section == 1 && favouriteCities.isEmpty {
@@ -100,13 +101,26 @@ class TableViewController: UITableViewController {
         
         if #available(iOS 14.0, *) {
             var cellConfig = cell.defaultContentConfiguration()
-            cellConfig.text = city.name
+            cellConfig.text = check(city: city)
             cell.contentConfiguration = cellConfig
         } else {
-            cell.textLabel?.text = city.name
+            cell.textLabel?.text = check(city: city)
         }
         
         return cell
+    }
+    
+    //MARK: Check city for state and country to display in cell
+    func check(city: City) -> String {
+        if let country = city.country, country != "" {
+            if let state = city.state, state != "" {
+                return "\(city.name), \(state), \(country)"
+            } else {
+                return "\(city.name), \(country)"
+            }
+        } else {
+            return "\(city.name)"
+        }
     }
     
     //MARK: Comparison of coordinates to obtain data on the presence of the same city
@@ -124,6 +138,7 @@ class TableViewController: UITableViewController {
         return result
     }
     
+    //MARK: Navigation preparation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "Detail" {
             let detailVC = segue.destination as! DetailViewController
@@ -158,10 +173,12 @@ extension TableViewController: UISearchResultsUpdating {
 //MARK: - Delegate need to update array of favourite cities: delete or add new ones
 extension TableViewController: CityWeatherDelegate {
     func passFavourite(city: City, add: Bool) {
+        //if "save" button was activated and city won't be found in favouriteCities - append new city to favouriteCities
         if add && !compare(city: city) {
             favouriteCities.append(city)
             cities = [currentLocation!, favouriteCities, filteredCities]
         } else if !add && compare(city: city) {
+            //if "save" button is not activated and we have city in favouriteCities - delete this city from favouriteCities and weather for this city
             if !favouriteCities.isEmpty {
                 favouriteCities.remove(at: favouriteCities.firstIndex(where: { favCity in
                     let lhs = favCity.coord

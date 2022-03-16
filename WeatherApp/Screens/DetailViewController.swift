@@ -46,7 +46,7 @@ class DetailViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        cityLabel.text = city?.name
+        setCityLabel()
         if savedState {
             favouriteCity.title = "Delete"
         } else {
@@ -61,12 +61,28 @@ class DetailViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
+        //save city and weather if need to
         cityWeatherDelegate?.passFavourite(city: city!, add: savedState)
         if savedState {
             UserDefaultsManager.shared.save(weather: weather!, for: city!)
         }
     }
     
+    //MARK: Properly set label for city
+    func setCityLabel() {
+        guard let city = city else { return }
+        if let country = city.country, country != "" {
+            if let state = city.state, state != "" {
+                cityLabel.text = "\(city.name), \(state), \(country)"
+            } else {
+                cityLabel.text = "\(city.name), \(country)"
+            }
+        } else {
+            cityLabel.text = city.name
+        }
+    }
+    
+    //MARK: Triggered by didSet in weather when we got the weather data
     func setParameters() {
         guard let weather = weather else { return }
         DispatchQueue.main.async {
@@ -79,6 +95,7 @@ class DetailViewController: UIViewController {
         }
     }
     
+    //MARK: Temperature button changes title when tapped
     func changeButtonState(_ condition: Bool) {
         guard let weather = weather else { return }
         if condition {
@@ -89,6 +106,7 @@ class DetailViewController: UIViewController {
         }
     }
 
+    //MARK: Getting weather data and trigger the didSet in weather
     func getWeather() {
         NetworkManager.shared.getWeather(coordinates: city!.coord) { result in
             switch result {
@@ -100,14 +118,4 @@ class DetailViewController: UIViewController {
             }
         }
     }
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
-
 }
