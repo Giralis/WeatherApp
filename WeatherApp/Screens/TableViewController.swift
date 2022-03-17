@@ -29,12 +29,17 @@ class TableViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        setNavigationBar()
         getLocation()
         getCities()
         filteredCities = allCities
         favouriteCities = UserDefaultsManager.shared.loadFavouriteCities() ?? [City]()
         cities = [favouriteCities, filteredCities]
+        setNavigationBar()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.navigationController?.setNavigationBarHidden(false, animated: animated)
     }
     
     //MARK: Get users current location and trigger didSet in currentLocation
@@ -69,8 +74,10 @@ class TableViewController: UITableViewController {
         
         let searchController = UISearchController(searchResultsController: nil)
         searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
         
         navigationItem.searchController = searchController
+        definesPresentationContext = false
         navigationItem.hidesSearchBarWhenScrolling = false
     }
     
