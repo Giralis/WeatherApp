@@ -7,7 +7,7 @@
 
 import Foundation
 
-class CityManager {
+final class CityManager {
     private init() {}
     static let shared = CityManager()
     
