@@ -87,11 +87,11 @@ class DetailViewController: UIViewController {
         guard let weather = weather else { return }
         DispatchQueue.main.async {
             self.changeButtonState(self.buttonState)
-            self.pressureLabel.text = "Давление: \(String(weather.current.pressure)) мм рт ст"
-            self.humidityLabel.text = "Влажность: \(String(weather.current.humidity))%"
-            self.windSpeedLabel.text = "Скорость ветра: \(String(weather.current.windSpeed)) м/с"
-            self.windDegLabel.text = "Направление ветра: \(String(weather.current.windDeg))°"
-            self.popLabel.text = "Вероятность выпадения осадков сегодня: \(String(weather.daily[0].pop * 100))%"
+            self.pressureLabel.text = "Pressure: \(String(weather.current.pressure)) mmhg"
+            self.humidityLabel.text = "Humidity: \(String(weather.current.humidity))%"
+            self.windSpeedLabel.text = "Wind speed: \(String(weather.current.windSpeed)) m/s"
+            self.windDegLabel.text = "Wind degree: \(String(weather.current.windDeg))°"
+            self.popLabel.text = "Probability of precipitation: \(String(weather.daily[0].pop * 100))%"
         }
     }
     
